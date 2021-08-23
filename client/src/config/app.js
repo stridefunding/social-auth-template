@@ -8,16 +8,23 @@ import { getAnonymousToken } from './sdk';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [anonToken, setAnonToken] = useState(null)
+  const [anonToken, setAnonToken] = useState(null);
 
   useEffect(() => {
-    getAnonymousToken().then(res => {
-      console.log(res.data)
-      if (res.data) {
-        setAnonToken(res.data)
-      }
-    })
-  }, [])
+    const userId = localStorage.getItem('userId');
+    const access = localStorage.getItem('access');
+    const refresh = localStorage.getItem('refresh');
+    if (userId && userId !== 'undefined') {
+      setAnonToken({ access, refresh });
+    } else {
+      getAnonymousToken().then(res => {
+        console.log(res.data);
+        if (res.data) {
+          setAnonToken(res.data);
+        }
+      });
+    }
+  }, []);
 
   return (
     <>

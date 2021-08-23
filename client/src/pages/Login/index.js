@@ -29,7 +29,7 @@ const Login = () => {
 
   const openGoogleLoginPage = useCallback(() => {
     const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
-    const redirectUri = 'auth/login/google/callback/';
+    const redirectUri = 'account/link-social/google/callback/';
 
     const scope = [
       'https://www.googleapis.com/auth/userinfo.email',
@@ -52,7 +52,7 @@ const Login = () => {
 
   const openLinkedLoginPage = useCallback(() => {
     const linkedInAuthUrl = 'https://www.linkedin.com/uas/oauth2/authorization';
-    const redirectUri = 'auth/login/linkedin/callback/';
+    const redirectUri = 'account/link-social/linkedin/callback/';
 
     const scope = ['r_liteprofile', 'r_emailaddress', 'w_member_social'].join(
       ' '

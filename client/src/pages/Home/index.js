@@ -6,7 +6,7 @@ import { useUserRequired } from 'utils/hooks';
 import { UserContext, GithubStars, Layout } from 'components';
 
 import welcomePandaGif from './assets/welcome-panda.gif';
-import { logout, validateTokenAndObtainUser } from './sdk';
+import { getUserInfoFromToken, validateTokenAndObtainUser } from './sdk';
 import styles from './Home.module.css';
 
 const Home = () => {
@@ -20,24 +20,33 @@ const Home = () => {
       const params = new URLSearchParams(search);
       const code = params.get('code');
       const provider = params.get('provider');
-      console.log(code, provider)
+      console.log(code, provider);
       if (code && provider) {
         validateTokenAndObtainUser(provider, code, anonToken.access)
-        .then(res => {
-          console.log(res.data)
-          if (res.data.user) {
-            setUser(res.data.user)
-          }
-        }).catch(error => {
-          console.log(error)
-        })
+          .then(tokenRes => {
+            console.log(tokenRes.data);
+            if (tokenRes.data) {
+              localStorage.setItem('refresh', tokenRes.data.refresh);
+              localStorage.setItem('access', tokenRes.data.access);
+              getUserInfoFromToken(tokenRes.data.access).then(userRes => {
+                if (userRes.data) {
+                  setUser(userRes.data);
+                  localStorage.setItem('userId', userRes.data.id);
+                }
+              });
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
       }
     }
-  }, [history.location, anonToken])
-  
+  }, [history.location, anonToken]);
+
   const handleLogout = useCallback(() => {
-      setUser(null);
-      history.push(LOGIN_URL);
+    localStorage.clear();
+    setUser(null);
+    history.push(LOGIN_URL);
   }, [setUser, history]);
 
   return (
@@ -46,12 +55,11 @@ const Home = () => {
         src={welcomePandaGif}
         alt="Welcome Panda"
         className={styles.pandaImg}
-      />      
+      />
       <h1 className={styles.userEmail}>{user?.email || 'home page'}</h1>
       <button className={styles.logoutBtn} onClick={handleLogout}>
         LOGOUT
       </button>
-      <GithubStars className={styles.githubStars} />
     </Layout>
   );
 };
