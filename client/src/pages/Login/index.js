@@ -1,17 +1,16 @@
 import React, { useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import GoogleButton from 'react-google-button';
-
 import { notifyError } from 'utils/notifications';
-import { GithubStars, Layout } from 'components';
+import { Layout } from 'components';
 
 import styles from './Login.module.css';
 
 const {
   REACT_APP_GOOGLE_CLIENT_ID,
   REACT_APP_BASE_BACKEND_URL,
-  REACT_APP_LINKED_CLIENT_ID
+  REACT_APP_LINKED_CLIENT_ID,
+  REACT_APP_FACEBOOK_CLIENT_ID
 } = process.env;
 
 const Login = () => {
@@ -72,11 +71,41 @@ const Login = () => {
     window.location = link;
   }, []);
 
+  const openFacebookLoginPage = useCallback(() => {
+    const facebookAuthUrl = 'https://www.facebook.com/v11.0/dialog/oauth';
+    const redirectUri = 'account/link-social/facebook/callback/';
+
+    const scope = ['email', 'public_profile'].join(' ');
+
+    const params = {
+      response_type: 'code',
+      client_id: REACT_APP_FACEBOOK_CLIENT_ID,
+      redirect_uri: `${REACT_APP_BASE_BACKEND_URL}/${redirectUri}`,
+      state: '8897239179ramya',
+      scope
+    };
+
+    const urlParams = new URLSearchParams(params).toString();
+    const link = `${facebookAuthUrl}?${urlParams}`;
+
+    window.location = link;
+  }, []);
+
   return (
     <Layout className={styles.content}>
       <h1 className={styles.pageHeader}>Welcome to our Demo App!</h1>
       <br />
       <br />
+
+      <button
+        onClick={openFacebookLoginPage}
+        disabled={!REACT_APP_LINKED_CLIENT_ID}>
+        Sign in with Facebook
+      </button>
+
+      <br />
+      <br />
+
       <button
         onClick={openGoogleLoginPage}
         disabled={!REACT_APP_GOOGLE_CLIENT_ID}>
